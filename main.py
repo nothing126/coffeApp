@@ -1,13 +1,26 @@
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.anchorlayout import AnchorLayout
-from kivy.uix.widget import Widget
+from kivy.lang import Builder
+from kivy.uix.anchorlayout import AnchorLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.image import AsyncImage
 from kivymd.app import MDApp
 from kivymd.uix.bottomnavigation import MDBottomNavigation, MDBottomNavigationItem
 from kivymd.uix.button import MDRaisedButton, MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.textfield import MDTextField
-from kivy.metrics import dp
+from kivy.core.window import Window
+
+Builder.load_string("""
+<ImageRectangle>:
+    canvas.before:
+        Color:
+            rgba: 0.8, 0.8, 0.8, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [28]
+""")
 
 
 class LoginContent(BoxLayout):
@@ -64,7 +77,63 @@ class RegistrationContent(BoxLayout):
         self.add_widget(self.password_field)
 
 
+class MenuContent(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        image_source = r'C:\Users\ajiga\PycharmProjects\coffeApp\foto\изображение_viber_2023-06-15_16-05-49-076.jpg'
+        image = AsyncImage(source=image_source, allow_stretch=True, keep_ratio=False)
+        self.add_widget(image)
+
+
+class ImageRectangle(BoxLayout):
+    def __init__(self, image_source, **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'vertical'
+        self.spacing = '20dp'
+        self.padding = '20dp'
+        self.size_hint_y = None
+
+        self.image = AsyncImage(source=image_source, allow_stretch=True, keep_ratio=False)
+        self.add_widget(self.image)
+        self.bind(size=self.update_size)
+
+    def update_size(self, *args):
+        self.image.size = self.size
+
+
+class ActionsContent(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'vertical'
+        self.spacing = '20dp'
+        self.padding = '20dp'
+
+        # Здесь указывайте шаблон пути для каждого прямоугольника
+        image_sources = [
+            'path_to_image_1.jpg',
+            'path_to_image_2.jpg',
+            'path_to_image_3.jpg'
+        ]
+
+        # Создаем экземпляры ImageRectangle для каждого пути к изображению
+        for source in image_sources:
+            self.add_widget(ImageRectangle(image_source=source))
+
+        self.size_hint_y = None
+        self.height = Window.height * 0.8  # Adjust the height as needed
+        self.pos_hint = {'top': 1}  # Move the content to the top of the screen
+
+
+def anonymous_button_pressed():
+    # Handle anonymous button functionality here
+    print("Anonymous button pressed")
+
+
 class Test(MDApp):
+    def __init__(self, **kwargs):
+        super().__init__(kwargs)
+        self.dialog = None
+
     def build(self):
         self.theme_cls.material_style = "M2"
         self.theme_cls.theme_style = "Dark"
@@ -80,11 +149,13 @@ class Test(MDApp):
             text='акции',
             badge_icon="numeric-10"
         )
+        tab1.add_widget(ActionsContent())
         tab2 = MDBottomNavigationItem(
             name='screen 2',
             text='меню',
             badge_icon="numeric-10",
         )
+        tab2.add_widget(MenuContent())
         tab3 = MDBottomNavigationItem(
             name='screen 3',
             text='о нас',
@@ -121,7 +192,7 @@ class Test(MDApp):
 
         button_anonymous = MDRaisedButton(
             text="Анонимное посещение",
-            on_release=self.anonymous_button_pressed
+            on_release=anonymous_button_pressed
         )
 
         center_box.add_widget(button_anonymous)
@@ -139,6 +210,7 @@ class Test(MDApp):
         return screen
 
     def show_dialog(self, button):
+        global buttons, title, content
         if button.custom_type == "login":
             content = LoginContent()
             title = "Login"
@@ -183,7 +255,7 @@ class Test(MDApp):
         )
         self.dialog.open()
 
-    def close_dialog(self, *args):
+    def close_dialog(self):
         self.dialog.dismiss()
 
     def login_button_pressed(self, *args):
@@ -202,9 +274,12 @@ class Test(MDApp):
             print(f"Name: {name}, Email: {email}, Login: {login}, Password: {password}")
         self.close_dialog()
 
-    def anonymous_button_pressed(self, *args):
-        # Handle anonymous button functionality here
-        print("Anonymous button pressed")
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Window.maximize()
+        self.theme_cls.material_style = "M2"
+        self.theme_cls.theme_style = "Dark"
+        self.dialog = None
 
 
 Test().run()
