@@ -1,6 +1,5 @@
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.lang import Builder
-from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import AsyncImage
 from kivymd.app import MDApp
@@ -10,6 +9,9 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.textfield import MDTextField
 from kivy.core.window import Window
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.scrollview import ScrollView
+
 
 Builder.load_string("""
 <ImageRectangle>:
@@ -19,14 +21,14 @@ Builder.load_string("""
         RoundedRectangle:
             pos: self.pos
             size: self.size
-            radius: [28]
+            radius: [15]
 """)
 
 
 class LoginContent(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.size_hint_y = None
+        self.size_hint_y = 7
 
         self.login_field = MDTextField(
             hint_text="Login",
@@ -89,10 +91,10 @@ class ImageRectangle(BoxLayout):
     def __init__(self, image_source, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
-        self.spacing = '20dp'
-        self.padding = '20dp'
+        self.spacing = '15dp'
+        self.padding = '8dp'
         self.size_hint_y = None
-
+        self.height = '170dp'
         self.image = AsyncImage(source=image_source, allow_stretch=True, keep_ratio=False)
         self.add_widget(self.image)
         self.bind(size=self.update_size)
@@ -105,33 +107,28 @@ class ActionsContent(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
-        self.spacing = '20dp'
-        self.padding = '20dp'
+        self.anchor_x = 'center'
+        self.anchor_y = 'center'
 
-        # Здесь указывайте шаблон пути для каждого прямоугольника
         image_sources = [
-            'path_to_image_1.jpg',
-            'path_to_image_2.jpg',
-            'path_to_image_3.jpg'
+            "path_to_image_1.jpg",
+            "path_to_image_2.jpg",
+            "path_to_image_3.jpg"
         ]
 
-        # Создаем экземпляры ImageRectangle для каждого пути к изображению
+        scroll_view = ScrollView(do_scroll_x=False, do_scroll_y=True, effect_cls="ScrollEffect")
+        grid_layout = GridLayout(cols=1, spacing='20dp', size_hint_y=None)
+        grid_layout.bind(minimum_height=grid_layout.setter('height'))
         for source in image_sources:
-            self.add_widget(ImageRectangle(image_source=source))
+            grid_layout.add_widget(ImageRectangle(image_source=source))
+        scroll_view.add_widget(grid_layout)
 
-        self.size_hint_y = None
-        self.height = Window.height * 0.8  # Adjust the height as needed
-        self.pos_hint = {'top': 1}  # Move the content to the top of the screen
-
-
-def anonymous_button_pressed():
-    # Handle anonymous button functionality here
-    print("Anonymous button pressed")
+        self.add_widget(scroll_view)
 
 
 class Test(MDApp):
     def __init__(self, **kwargs):
-        super().__init__(kwargs)
+        super().__init__(**kwargs)
         self.dialog = None
 
     def build(self):
@@ -190,12 +187,8 @@ class Test(MDApp):
                                pos_hint={'center_x': 0.5, 'center_y': 0.5})
         center_box.add_widget(button_layout)
 
-        button_anonymous = MDRaisedButton(
-            text="Анонимное посещение",
-            on_release=anonymous_button_pressed
-        )
 
-        center_box.add_widget(button_anonymous)
+
 
         center_layout.add_widget(center_box)
 
@@ -210,7 +203,6 @@ class Test(MDApp):
         return screen
 
     def show_dialog(self, button):
-        global buttons, title, content
         if button.custom_type == "login":
             content = LoginContent()
             title = "Login"
@@ -219,13 +211,13 @@ class Test(MDApp):
                     text="CANCEL",
                     theme_text_color="Custom",
                     text_color=self.theme_cls.primary_color,
-                    on_release=self.close_dialog,
+                    on_release=self.dismiss_dialog,
                 ),
                 MDFlatButton(
                     text="OK",
                     theme_text_color="Custom",
                     text_color=self.theme_cls.primary_color,
-                    on_release=self.login_button_pressed,
+                    on_release=self.dismiss_dialog,
                 ),
             ]
         elif button.custom_type == "registration":
@@ -236,13 +228,13 @@ class Test(MDApp):
                     text="CANCEL",
                     theme_text_color="Custom",
                     text_color=self.theme_cls.primary_color,
-                    on_release=self.close_dialog,
+                    on_release=self.dismiss_dialog,
                 ),
                 MDFlatButton(
                     text="OK",
                     theme_text_color="Custom",
                     text_color=self.theme_cls.primary_color,
-                    on_release=self.register_button_pressed,
+                    on_release=self.dismiss_dialog,
                 ),
             ]
 
@@ -251,35 +243,14 @@ class Test(MDApp):
             type="custom",
             content_cls=content,
             buttons=buttons,
-            auto_dismiss=False,
         )
         self.dialog.open()
 
-    def close_dialog(self):
-        self.dialog.dismiss()
+    def dismiss_dialog(self, *args):
+        if self.dialog:
+            self.dialog.dismiss()
 
-    def login_button_pressed(self, *args):
-        if args and args[0].text == "OK":
-            login = self.dialog.content_cls.login_field.text
-            password = self.dialog.content_cls.password_field.text
-            print(f"Login: {login}, Password: {password}")
-        self.close_dialog()
 
-    def register_button_pressed(self, *args):
-        if args and args[0].text == "OK":
-            name = self.dialog.content_cls.name_field.text
-            email = self.dialog.content_cls.email_field.text
-            login = self.dialog.content_cls.login_field.text
-            password = self.dialog.content_cls.password_field.text
-            print(f"Name: {name}, Email: {email}, Login: {login}, Password: {password}")
-        self.close_dialog()
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        Window.maximize()
-        self.theme_cls.material_style = "M2"
-        self.theme_cls.theme_style = "Dark"
-        self.dialog = None
 
 
 Test().run()
