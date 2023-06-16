@@ -11,7 +11,6 @@ from kivymd.uix.textfield import MDTextField
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
 import sqlite3
-from kivymd.uix.card import MDCard
 
 Builder.load_string("""
 <ImageRectangle>:
@@ -28,22 +27,21 @@ Builder.load_string("""
 class LoginContent(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.size_hint_y = None # Изменено значение для увеличения размера окна по высоте
+        self.size_hint_y = 8
 
         self.login_field = MDTextField(
             hint_text="Login",
             helper_text_mode="on_focus",
-            pos_hint={"center_x": 0.5},
+            pos_hint={"center_x": 0.3},
         )
         self.add_widget(self.login_field)
 
         self.password_field = MDTextField(
             hint_text="Password",
             helper_text_mode="on_focus",
-            pos_hint={"center_x": 0.5},
+            pos_hint={"center_x": 0.3},
         )
         self.add_widget(self.password_field)
-
 
 
 class RegistrationContent(BoxLayout):
@@ -167,38 +165,26 @@ class Test(MDApp):
 
         center_layout = AnchorLayout(anchor_x='center', anchor_y='center')
 
-        button_layout = BoxLayout(orientation='vertical', spacing='10dp', size=(500, 350),)
+        button_layout = BoxLayout(orientation='vertical', spacing='10dp', size_hint=(None, None), size=(300, 200),
+                                  pos_hint={"center_x": 0.5, "center_y": 0.5})
 
-        button_layout.size_hint = (None, None)
-        button_layout.height = "200dp"
-
-        card_login = MDCard(
-            size_hint=(None, None),
-            size=(65, 35),
-            pos_hint={"center_x": 0.5},
-            radius=[15, 15, 15, 15],
-            md_bg_color=self.theme_cls.primary_color
-        )
         button_login = MDFlatButton(
             text="Вход",
-            on_release=self.show_login_dialog
-        )
-        card_login.add_widget(button_login)
-        button_layout.add_widget(card_login)
-
-        card_register = MDCard(
             size_hint=(None, None),
-            size=(100, 38),
+            size=(200, 50),
             pos_hint={"center_x": 0.5},
-            radius=[15, 15, 15, 15],
-            md_bg_color=self.theme_cls.primary_color
+            on_release=self.show_dialog
         )
         button_register = MDFlatButton(
             text="Регистрация",
-            on_release=self.show_registration_dialog
+            size_hint=(None, None),
+            size=(200, 50),
+            pos_hint={"center_x": 0.5},
+            on_release=self.show_dialog
         )
-        card_register.add_widget(button_register)
-        button_layout.add_widget(card_register)
+
+        button_layout.add_widget(button_login)
+        button_layout.add_widget(button_register)
 
         center_layout.add_widget(button_layout)
 
@@ -213,51 +199,25 @@ class Test(MDApp):
 
         return screen
 
-    def show_login_dialog(self, obj):
+    def show_dialog(self, obj):
         self.dialog = MDDialog(
-            title="Вход",
+            title="вход",
             type="custom",
-            content_cls=LoginContent(),
+            content_cls=LoginContent() if obj.text == "Вход" else RegistrationContent(),
             buttons=[
                 MDFlatButton(
                     text="CANCEL", text_color=self.theme_cls.primary_color, on_release=self.close_dialog
                 ),
                 MDRaisedButton(
-                    text="LOGIN",
-                    on_release=self.login_button_pressed
+                    text="REGISTER" if obj.text == "Регистрация" else "LOGIN",
+                    on_release=self.login_button_pressed if obj.text == "Вход" else self.register_button_pressed
                 ),
             ],
-            size=(400,200),
-            size_hint=(None, None),
-            md_bg_color=self.theme_cls.bg_dark
-        )
-        self.dialog.open()
-
-    def show_registration_dialog(self, obj):
-        self.dialog = MDDialog(
-            title="Регистрация",
-            type="custom",
-            content_cls=RegistrationContent(),
-            buttons=[
-                MDFlatButton(
-                    text="CANCEL", text_color=self.theme_cls.primary_color, on_release=self.close_dialog
-                ),
-                MDRaisedButton(
-                    text="REGISTER",
-                    on_release=self.register_button_pressed
-                ),
-            ],
-            size=(500, 350),
-            size_hint=(None, None),
-            md_bg_color=self.theme_cls.bg_dark
         )
         self.dialog.open()
 
     def close_dialog(self, obj):
         self.dialog.dismiss()
-
-    def close_success_dialog(self, obj):
-        self.success_dialog.dismiss()
 
     def login_button_pressed(self, obj):
         login_text = self.dialog.content_cls.login_field.text
@@ -274,31 +234,41 @@ class Test(MDApp):
         self.conn = sqlite3.connect("registration.db")
         self.cursor = self.conn.cursor()
 
-        # Check if the email already exists in the database
-        self.cursor.execute("SELECT * FROM registration_data WHERE email = ?", (email_text,))
-        existing_user = self.cursor.fetchone()
+        # Insert registration data into the table
+        self.cursor.execute(
+            "INSERT INTO registration_data (name, email, login, password) VALUES (?, ?, ?, ?)",
+            (name_text, email_text, login_text, password_text)
+        )
 
-        if existing_user:
-            self.show_error_dialog("Пользователь с такой почтой уже зарегистрирован!")
-        else:
-            # Insert new user into the database
-            self.cursor.execute("INSERT INTO registration_data (name, email, login, password) VALUES (?, ?, ?, ?)",
-                                (name_text, email_text, login_text, password_text))
-            self.conn.commit()
-            self.show_success_dialog("Регистрация прошла успешно!")
-            self.dialog.dismiss()  # Close the registration dialog
-
-        # Close the connection to the database
-        self.cursor.close()
+        # Commit changes and close the connection
+        self.conn.commit()
         self.conn.close()
 
-    def show_error_dialog(self, message):
-        error_dialog = MDDialog(
-            title="Ошибка",
-            text=message,
+        self.dialog.dismiss()
+        self.show_success_dialog()
+
+    def show_success_dialog(self):
+        success_dialog = MDDialog(
+            title="Success",
+            text="Registration successful!",
             buttons=[
                 MDFlatButton(
-                    text="OK", text_color=self.theme_cls.primary_color, on_release=self.close_dialog
+                    text="OK", text_color=self.theme_cls.primary_color, on_release=self.close_success_dialog
+                ),
+            ],
+        )
+        success_dialog.open()
+
+    def close_success_dialog(self, obj):
+        self.dialog.dismiss()
+
+    def show_error_dialog(self):
+        error_dialog = MDDialog(
+            title="Error",
+            text="неверное имя пользователя или пароль!",
+            buttons=[
+                MDFlatButton(
+                    text="OK", text_color=self.theme_cls.primary_color, on_release=self.close_error_dialog
                 ),
             ],
         )
@@ -307,17 +277,6 @@ class Test(MDApp):
     def close_error_dialog(self, obj):
         self.dialog.dismiss()
 
-    def show_success_dialog(self, message):
-        self.success_dialog = MDDialog(
-            title="Успех",
-            text=message,
-            buttons=[
-                MDFlatButton(
-                    text="OK", text_color=self.theme_cls.primary_color, on_release=self.close_success_dialog
-                ),
-            ],
-        )
-        self.success_dialog.open()
 
-
-Test().run()
+if __name__ == '__main__':
+    Test().run()
