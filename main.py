@@ -95,7 +95,7 @@ class ImageRectangle(BoxLayout):
         self.spacing = '15dp'
         self.padding = '8dp'
         self.size_hint_y = None
-        self.height = '170dp'
+        self.height = '900dp'
         self.image = AsyncImage(source=image_source, allow_stretch=True, keep_ratio=False)
         self.add_widget(self.image)
         self.bind(size=self.update_size)
@@ -112,9 +112,9 @@ class ActionsContent(BoxLayout):
         self.anchor_y = 'center'
 
         image_sources = [
-            "path_to_image_1.jpg",
-            "path_to_image_2.jpg",
-            "path_to_image_3.jpg"
+            r'C:\Users\ajiga\PycharmProjects\coffeApp\foto\изображение_viber_2023-06-15_16-05-49-076.jpg',
+            r'C:\Users\ajiga\PycharmProjects\coffeApp\foto\изображение_viber_2023-06-15_16-05-49-076.jpg',
+            r'C:\Users\ajiga\PycharmProjects\coffeApp\foto\изображение_viber_2023-06-15_16-05-49-076.jpg',
         ]
 
         scroll_view = ScrollView(do_scroll_x=False, do_scroll_y=True, effect_cls="ScrollEffect")
@@ -298,7 +298,7 @@ class Test(MDApp):
             text=message,
             buttons=[
                 MDFlatButton(
-                    text="OK", text_color=self.theme_cls.primary_color, on_release=self.close_dialog
+                    text="OK", text_color=self.theme_cls.primary_color, on_release=self.close_error_dialog
                 ),
             ],
         )
