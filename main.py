@@ -28,7 +28,7 @@ Builder.load_string("""
 class LoginContent(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.size_hint_y = None # Изменено значение для увеличения размера окна по высоте
+        self.size_hint_y = None
 
         self.login_field = MDTextField(
             hint_text="Login",
@@ -43,7 +43,6 @@ class LoginContent(BoxLayout):
             pos_hint={"center_x": 0.5},
         )
         self.add_widget(self.password_field)
-
 
 
 class RegistrationContent(BoxLayout):
@@ -83,9 +82,10 @@ class RegistrationContent(BoxLayout):
 class MenuContent(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        image_source = r'C:\Users\ajiga\PycharmProjects\coffeApp\foto\изображение_viber_2023-06-15_16-05-49-076.jpg'
-        image = AsyncImage(source=image_source, allow_stretch=True, keep_ratio=False)
-        self.add_widget(image)
+        scroll_view = ScrollView(do_scroll_x=False, do_scroll_y=True, effect_cls="ScrollEffect")
+        scroll_view.add_widget(ImageRectangle(image_source=r'C:\Users\ajiga\PycharmProjects\coffeApp\foto'
+                                                           r'\изображение_viber_2023-06-15_16-05-49-076.jpg', ))
+        self.add_widget(scroll_view)
 
 
 class ImageRectangle(BoxLayout):
@@ -112,9 +112,9 @@ class ActionsContent(BoxLayout):
         self.anchor_y = 'center'
 
         image_sources = [
-            r'C:\Users\ajiga\PycharmProjects\coffeApp\foto\изображение_viber_2023-06-15_16-05-49-076.jpg',
-            r'C:\Users\ajiga\PycharmProjects\coffeApp\foto\изображение_viber_2023-06-15_16-05-49-076.jpg',
-            r'C:\Users\ajiga\PycharmProjects\coffeApp\foto\изображение_viber_2023-06-15_16-05-49-076.jpg',
+            'path_to_image',
+            'path_to_image',
+            "path_to_image",
         ]
 
         scroll_view = ScrollView(do_scroll_x=False, do_scroll_y=True, effect_cls="ScrollEffect")
@@ -167,7 +167,7 @@ class Test(MDApp):
 
         center_layout = AnchorLayout(anchor_x='center', anchor_y='center')
 
-        button_layout = BoxLayout(orientation='vertical', spacing='10dp', size=(500, 350),)
+        button_layout = BoxLayout(orientation='vertical', spacing='10dp', size=(500, 350), )
 
         button_layout.size_hint = (None, None)
         button_layout.height = "200dp"
@@ -227,7 +227,7 @@ class Test(MDApp):
                     on_release=self.login_button_pressed
                 ),
             ],
-            size=(400,200),
+            size=(400, 200),
             size_hint=(None, None),
             md_bg_color=self.theme_cls.bg_dark
         )
@@ -262,6 +262,7 @@ class Test(MDApp):
     def login_button_pressed(self, obj):
         login_text = self.dialog.content_cls.login_field.text
         password_text = self.dialog.content_cls.password_field.text
+        print(f"login:{login_text},password:{password_text}")
 
     def register_button_pressed(self, obj):
         # Code for handling register button pressed
@@ -293,7 +294,7 @@ class Test(MDApp):
         self.conn.close()
 
     def show_error_dialog(self, message):
-        error_dialog = MDDialog(
+        self.error_dialog = MDDialog(
             title="Ошибка",
             text=message,
             buttons=[
@@ -302,10 +303,10 @@ class Test(MDApp):
                 ),
             ],
         )
-        error_dialog.open()
+        self.error_dialog.open()
 
     def close_error_dialog(self, obj):
-        self.dialog.dismiss()
+        self.error_dialog.dismiss()
 
     def show_success_dialog(self, message):
         self.success_dialog = MDDialog(
