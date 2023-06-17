@@ -13,6 +13,7 @@ from kivy.uix.scrollview import ScrollView
 import sqlite3
 from kivymd.uix.card import MDCard
 
+# для класса ImageRectangle для определения закругления, цвета, размера и позиции
 Builder.load_string("""
 <ImageRectangle>:
     canvas.before:
@@ -30,18 +31,22 @@ class LoginContent(BoxLayout):
         super().__init__(**kwargs)
         self.size_hint_y = None
 
+        # определяет поле для логина при входе
         self.login_field = MDTextField(
             hint_text="Login",
             helper_text_mode="on_focus",
             pos_hint={"center_x": 0.5},
         )
+        # добавляет виджет с полем для логина
         self.add_widget(self.login_field)
 
+        # определяет поле для пароля при входе
         self.password_field = MDTextField(
             hint_text="Password",
             helper_text_mode="on_focus",
             pos_hint={"center_x": 0.5},
         )
+        # добавляет виджет с полем для пароля
         self.add_widget(self.password_field)
 
 
@@ -50,39 +55,50 @@ class RegistrationContent(BoxLayout):
         super().__init__(**kwargs)
         self.size_hint_y = None
 
+        # определяет поле для имени при регистрации
         self.name_field = MDTextField(
             hint_text="Name",
             helper_text_mode="on_focus",
-            pos_hint={"center_x": 0.3},
+            pos_hint={"center_x": 0.5},
         )
+        # добавляет виджет с полем для имени
         self.add_widget(self.name_field)
 
+        # определяет поле для почты при регистрации
         self.email_field = MDTextField(
             hint_text="Email",
             helper_text_mode="on_focus",
-            pos_hint={"center_x": 0.3},
+            pos_hint={"center_x": 0.5},
         )
+        # добавляет виджет с полем для почты
         self.add_widget(self.email_field)
 
+        # определяет поле для логина при регистрации
         self.login_field = MDTextField(
             hint_text="Login",
             helper_text_mode="on_focus",
-            pos_hint={"center_x": 0.3},
+            pos_hint={"center_x": 0.5},
         )
+        # добавляет виджет с полем для логина
         self.add_widget(self.login_field)
 
+        # определяет поле для пароля при регистрации
         self.password_field = MDTextField(
             hint_text="Password",
             helper_text_mode="on_focus",
-            pos_hint={"center_x": 0.3},
+            pos_hint={"center_x": 0.5},
         )
+        # добавляет виджет с полем для пароля
         self.add_widget(self.password_field)
 
 
 class MenuContent(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # добавляет скролинг в окне с меню
         scroll_view = ScrollView(do_scroll_x=False, do_scroll_y=True, effect_cls="ScrollEffect")
+        # добавляет в виджет скролинга виджет с карктикой, обращается к классу
+        # ImageRectangle для создания поля в виде прямоугольника с скргуленными унлами
         scroll_view.add_widget(ImageRectangle(image_source=r'C:\Users\ajiga\PycharmProjects\coffeApp\foto'
                                                            r'\изображение_viber_2023-06-15_16-05-49-076.jpg', ))
         self.add_widget(scroll_view)
@@ -91,11 +107,16 @@ class MenuContent(BoxLayout):
 class ImageRectangle(BoxLayout):
     def __init__(self, image_source, **kwargs):
         super().__init__(**kwargs)
+        # определяет ориентацию
         self.orientation = 'vertical'
+        # определяет промежуток между окнами прямоугольников
         self.spacing = '15dp'
+        # определяет обводку окон прямоугольников
         self.padding = '8dp'
         self.size_hint_y = None
+        # определяет высоту прямоугольников
         self.height = '900dp'
+        # позволяет картике растягиваться
         self.image = AsyncImage(source=image_source, allow_stretch=True, keep_ratio=False)
         self.add_widget(self.image)
         self.bind(size=self.update_size)
@@ -107,10 +128,12 @@ class ImageRectangle(BoxLayout):
 class ActionsContent(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # определяет положение по центру и вертикальную ориентацию
         self.orientation = 'vertical'
         self.anchor_x = 'center'
         self.anchor_y = 'center'
 
+        # пути к картинкам, строго в пронумерованом порядке по строкам
         image_sources = [
             'path_to_image',
             'path_to_image',
@@ -136,29 +159,39 @@ class Test(MDApp):
         self.theme_cls.material_style = "M2"
         self.theme_cls.theme_style = "Dark"
         self.dialog = None
-
+        # определяет переменную screen как экран приложения
         screen = MDScreen()
-        screen.md_bg_color = [1, 1, 1, 1]
+
+        screen.md_bg_color = [0, 0, 0, 1]
 
         bottom_navigation = MDBottomNavigation()
 
+        # иконка нижнего управления для вкладки "акции"
         tab1 = MDBottomNavigationItem(
             name='screen 1',
             text='акции',
             badge_icon="numeric-10"
         )
+        # добавляет в вкладку "акции" класс содержащий акции
         tab1.add_widget(ActionsContent())
+
+        # иконка нижнего управления для вкладки "меню"
         tab2 = MDBottomNavigationItem(
             name='screen 2',
             text='меню',
             badge_icon="numeric-10",
         )
+
+        # добавляет в вкладку "меню" класс содержащий меню
         tab2.add_widget(MenuContent())
+
+        # иконка нижнего управления для вкладки "о нас"
         tab3 = MDBottomNavigationItem(
             name='screen 3',
             text='о нас',
             badge_icon="numeric-10"
         )
+        # иконка нижнего управления для вкладки "главная"
         tab4 = MDBottomNavigationItem(
             name='screen 4',
             text='главная',
@@ -171,7 +204,7 @@ class Test(MDApp):
 
         button_layout.size_hint = (None, None)
         button_layout.height = "200dp"
-
+        # устанавливает размеры кнопки и цвет фона
         card_login = MDCard(
             size_hint=(None, None),
             size=(65, 35),
@@ -179,13 +212,17 @@ class Test(MDApp):
             radius=[15, 15, 15, 15],
             md_bg_color=self.theme_cls.primary_color
         )
+        # устанавливвет текст кнопки и функцию при ее нажатии
         button_login = MDFlatButton(
             text="Вход",
             on_release=self.show_login_dialog
         )
+        # добавляет виджет с текстом и функцией на поле для кнопки
         card_login.add_widget(button_login)
+        # добавляет ранее сохранненый виджет на место для кнопки
         button_layout.add_widget(card_login)
 
+        # устанавливает размеры кнопки и цвет фона
         card_register = MDCard(
             size_hint=(None, None),
             size=(100, 38),
@@ -193,6 +230,7 @@ class Test(MDApp):
             radius=[15, 15, 15, 15],
             md_bg_color=self.theme_cls.primary_color
         )
+        # устанавливвет текст кнопки и функцию при ее нажатии
         button_register = MDFlatButton(
             text="Регистрация",
             on_release=self.show_registration_dialog
@@ -203,17 +241,18 @@ class Test(MDApp):
         center_layout.add_widget(button_layout)
 
         tab4.add_widget(center_layout)
-
+        # добавляет в нижнюю панель управления элементы
         bottom_navigation.add_widget(tab1)
         bottom_navigation.add_widget(tab2)
         bottom_navigation.add_widget(tab3)
         bottom_navigation.add_widget(tab4)
-
+        # добавляет на экран нижнюю панель управления
         screen.add_widget(bottom_navigation)
 
         return screen
 
     def show_login_dialog(self, obj):
+        # показывает диалог входа с кнопками
         self.dialog = MDDialog(
             title="Вход",
             type="custom",
@@ -227,6 +266,7 @@ class Test(MDApp):
                     on_release=self.login_button_pressed
                 ),
             ],
+            # устанавливает размеры и цвет фона
             size=(400, 200),
             size_hint=(None, None),
             md_bg_color=self.theme_cls.bg_dark
@@ -234,6 +274,7 @@ class Test(MDApp):
         self.dialog.open()
 
     def show_registration_dialog(self, obj):
+        # показывает диалог регистрации с кнопками
         self.dialog = MDDialog(
             title="Регистрация",
             type="custom",
@@ -247,6 +288,7 @@ class Test(MDApp):
                     on_release=self.register_button_pressed
                 ),
             ],
+            # устанавливает размер окна диалога и цвет фона
             size=(500, 350),
             size_hint=(None, None),
             md_bg_color=self.theme_cls.bg_dark
@@ -254,46 +296,51 @@ class Test(MDApp):
         self.dialog.open()
 
     def close_dialog(self, obj):
+        # закрывает диалог
         self.dialog.dismiss()
 
     def close_success_dialog(self, obj):
+        # закрывает диалог успешной регистрации
         self.success_dialog.dismiss()
 
     def login_button_pressed(self, obj):
+        # сохраняет введенные данные входа и выводит их в консоль
         login_text = self.dialog.content_cls.login_field.text
         password_text = self.dialog.content_cls.password_field.text
         print(f"login:{login_text},password:{password_text}")
 
     def register_button_pressed(self, obj):
-        # Code for handling register button pressed
+        # сохраняет все введённые данные в переменные
         name_text = self.dialog.content_cls.name_field.text
         email_text = self.dialog.content_cls.email_field.text
         login_text = self.dialog.content_cls.login_field.text
         password_text = self.dialog.content_cls.password_field.text
 
-        # Open connection to the database
+        # указание файла для базы данных
         self.conn = sqlite3.connect("registration.db")
+        # создание курсора
         self.cursor = self.conn.cursor()
 
-        # Check if the email already exists in the database
+        # проверка почты для проверки регистрации
         self.cursor.execute("SELECT * FROM registration_data WHERE email = ?", (email_text,))
         existing_user = self.cursor.fetchone()
 
         if existing_user:
             self.show_error_dialog("Пользователь с такой почтой уже зарегистрирован!")
         else:
-            # Insert new user into the database
+            # если пользователя с такой почтой нет, то записывает его в таблицу
             self.cursor.execute("INSERT INTO registration_data (name, email, login, password) VALUES (?, ?, ?, ?)",
                                 (name_text, email_text, login_text, password_text))
             self.conn.commit()
             self.show_success_dialog("Регистрация прошла успешно!")
             self.dialog.dismiss()  # Close the registration dialog
 
-        # Close the connection to the database
+        # закрытие базы данных и курсора
         self.cursor.close()
         self.conn.close()
 
     def show_error_dialog(self, message):
+        # показывает диалог ошибки
         self.error_dialog = MDDialog(
             title="Ошибка",
             text=message,
@@ -306,9 +353,11 @@ class Test(MDApp):
         self.error_dialog.open()
 
     def close_error_dialog(self, obj):
+        # закрывает диалог ошибки
         self.error_dialog.dismiss()
 
     def show_success_dialog(self, message):
+        # показывает диалог успешного выполнения
         self.success_dialog = MDDialog(
             title="Успех",
             text=message,
@@ -321,4 +370,5 @@ class Test(MDApp):
         self.success_dialog.open()
 
 
+# запускает главный класс test
 Test().run()
