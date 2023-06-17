@@ -10,7 +10,7 @@ from kivymd.uix.screen import MDScreen
 from kivymd.uix.textfield import MDTextField
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.scrollview import ScrollView
-import sqlite3
+# import sqlite3
 from kivymd.uix.card import MDCard
 
 # для класса ImageRectangle для определения закругления, цвета, размера и позиции
@@ -317,27 +317,27 @@ class Test(MDApp):
         password_text = self.dialog.content_cls.password_field.text
 
         # указание файла для базы данных
-        self.conn = sqlite3.connect("registration.db")
-        # создание курсора
-        self.cursor = self.conn.cursor()
-
-        # проверка почты для проверки регистрации
-        self.cursor.execute("SELECT * FROM registration_data WHERE email = ?", (email_text,))
-        existing_user = self.cursor.fetchone()
-
-        if existing_user:
-            self.show_error_dialog("Пользователь с такой почтой уже зарегистрирован!")
-        else:
-            # если пользователя с такой почтой нет, то записывает его в таблицу
-            self.cursor.execute("INSERT INTO registration_data (name, email, login, password) VALUES (?, ?, ?, ?)",
-                                (name_text, email_text, login_text, password_text))
-            self.conn.commit()
-            self.show_success_dialog("Регистрация прошла успешно!")
-            self.dialog.dismiss()  # Close the registration dialog
-
-        # закрытие базы данных и курсора
-        self.cursor.close()
-        self.conn.close()
+        # self.conn = sqlite3.connect("registration.db")
+        # # создание курсора
+        # self.cursor = self.conn.cursor()
+        #
+        # # проверка почты для проверки регистрации
+        # self.cursor.execute("SELECT * FROM registration_data WHERE email = ?", (email_text,))
+        # existing_user = self.cursor.fetchone()
+        #
+        # if existing_user:
+        #     self.show_error_dialog("Пользователь с такой почтой уже зарегистрирован!")
+        # else:
+        #     # если пользователя с такой почтой нет, то записывает его в таблицу
+        #     self.cursor.execute("INSERT INTO registration_data (name, email, login, password) VALUES (?, ?, ?, ?)",
+        #                         (name_text, email_text, login_text, password_text))
+        #     self.conn.commit()
+        #     self.show_success_dialog("Регистрация прошла успешно!")
+        #     self.dialog.dismiss()  # Close the registration dialog
+        #
+        # # закрытие базы данных и курсора
+        # self.cursor.close()
+        # self.conn.close()
 
     def show_error_dialog(self, message):
         # показывает диалог ошибки
